@@ -4,31 +4,34 @@ import getPoke from './services/getPoke'
 import getPokeByType from './services/getPokeByType'
 import Pokemon from './components/Pokemon'
 import Search from './components/Search'
+import PokemonItem from './components/PokemonItem'
 
 function App () {
   const [queryTerm, setQueryTerm] = useState('')
-  const [pokeUrl, setPokeUrl] = useState('')
-  const [pokeUrlTwo, setPokeUrlTwo] = useState('')
-  const [pokeUrlThree, setPokeUrlThree] = useState('')
+  const [numOfPokemons, setNumOfPokemons] = useState(10)
+  // Para trabajar con listas deben usar de base un arreglo
+  const [pokemons, setPokemons] = useState([])
 
   useEffect(() => {
     if (queryTerm) {
       getPokeByType(queryTerm).then(res => {
-        console.log(res.data)
-        setPokeUrl(res.data.pokemon[0].pokemon.url)
-        setPokeUrlTwo(res.data.pokemon[1].pokemon.url)
-        setPokeUrlThree(res.data.pokemon[2].pokemon.url)
+        setPokemons(res.data.pokemon.slice(0, numOfPokemons))
       })
     }
-  }, [queryTerm])
+  }, [queryTerm, numOfPokemons])
+
+  const list = pokemons.map(value => {
+    return <Pokemon url={value.pokemon.url} key={value.pokemon.name} />
+  })
 
   return (
     <div className='App'>
       <header className='App-header'>
-        <Search handleSearch={setQueryTerm} />
-        <Pokemon url={pokeUrl} />
-        <Pokemon url={pokeUrlTwo} />
-        <Pokemon url={pokeUrlThree} />
+        <Search
+          handleSearch={setQueryTerm}
+          handleChangeAmount={setNumOfPokemons}
+        />
+        {list}
       </header>
     </div>
   )
